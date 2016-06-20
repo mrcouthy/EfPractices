@@ -13,7 +13,7 @@ namespace EfPractices.Model
         public string Description { get; set; }
     }
 
-    public class Surveys
+    public class Surveys:s
     {
         public int SurveyId { get; set; }
         public string Name { get; set; }

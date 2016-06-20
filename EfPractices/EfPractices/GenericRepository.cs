@@ -133,4 +133,35 @@ namespace EfPractices
             return i;
         }
     }
+
+    public class s
+    {
+        public DateTime? CreatedOn { get; set; }
+        public DateTime? ModifiedOn { get; set; }
+    }
+
+    public class OfflineUpdater<TEntity> where TEntity : s
+    {
+        public int UpdateToOffline()
+        {
+            int c = 0;
+            using (var dbOffcontext = new AdbContext(DatabaseType.Sqlite))
+            using (var dbcontext = new AdbContext())
+            {
+                var gr = new GenericUpdater<TEntity, DateTime?>(sourceContext: dbcontext, destinationContext: dbOffcontext);
+                var max = gr.GetMax(a => a.CreatedOn);
+                c = gr.GetToUpdateData(a => a.CreatedOn, b => b.CreatedOn != null && b.CreatedOn > max, true);
+            }
+
+            using (var dbOffcontext = new AdbContext(DatabaseType.Sqlite))
+            using (var dbcontext = new AdbContext())
+            {
+                var gr = new GenericUpdater<TEntity, DateTime?>(sourceContext: dbcontext, destinationContext: dbOffcontext);
+                var max = gr.GetMax(a => a.ModifiedOn);
+                c = gr.GetToUpdateData(a => a.ModifiedOn, b => b.ModifiedOn != null && b.ModifiedOn > max, false);
+            }
+
+            return c;
+        }
+    }
 }

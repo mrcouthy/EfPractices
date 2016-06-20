@@ -82,5 +82,12 @@ namespace SurveyRepositoryTest
                 Assert.AreEqual(c, 1);
             }
         }
+
+        [TestMethod]
+        public void GenerateS()
+        {
+            var gr = new OfflineUpdater<Surveys>();
+            gr.UpdateToOffline();
+        }
     }
 }
