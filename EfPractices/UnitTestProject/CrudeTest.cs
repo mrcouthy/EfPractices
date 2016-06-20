@@ -71,15 +71,27 @@ namespace SurveyRepositoryTest
         }
 
         [TestMethod]
-        public void Generate()
+        public void InsertTest()
         {
             using (var dbOffcontext = new AdbContext(DatabaseType.Sqlite))
             using (var dbcontext = new AdbContext())
             {
-                var gr = new GenericUpdater<Surveys, DateTime?>(sourceContext: dbcontext,destinationContext: dbOffcontext);
-                var max= gr.GetMax(a => a.CreatedOn); 
-                var c = gr.GetToUpdateData(a => a.CreatedOn, b=>b.CreatedOn != null && b.CreatedOn > max,true);
+                var gr = new GenericUpdater<Surveys, DateTime?>(sourceContext: dbcontext, destinationContext: dbOffcontext);
+                var max = gr.GetMax(a => a.CreatedOn);
+                var c = gr.GetToUpdateData(a => a.CreatedOn, b => b.CreatedOn != null && b.CreatedOn > max, true);
                 Assert.AreEqual(c, 1);
+            }
+        }
+
+        [TestMethod]
+        public void UpdateTest()
+        {
+            using (var dbOffcontext = new AdbContext(DatabaseType.Sqlite))
+            using (var dbcontext = new AdbContext())
+            {
+                var gr = new GenericUpdater<Surveys, DateTime?>(sourceContext: dbcontext, destinationContext: dbOffcontext);
+                var max = gr.GetMax(a => a.ModifiedOn);
+                var c = gr.GetToUpdateData(a => a.ModifiedOn, b => b.ModifiedOn != null && b.ModifiedOn > max, false);
             }
         }
 

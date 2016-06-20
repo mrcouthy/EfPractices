@@ -94,6 +94,8 @@ namespace EfPractices
 
         public GenericUpdater(DbContext sourceContext, DbContext destinationContext)
         {
+            destinationContext.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+            sourceContext.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
             this.destinationContext = destinationContext;
             this.sourceContext = sourceContext;
             this.dbSourceSet = sourceContext.Set<TEntity>();
@@ -110,6 +112,8 @@ namespace EfPractices
              Expression<Func<TEntity, bool>> filter = null,
              bool isInsert = true)
         {
+
+
             IQueryable<TEntity> query = dbSourceSet;
             if (filter != null)
             {
