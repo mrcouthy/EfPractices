@@ -87,19 +87,50 @@ namespace EfPractices
 
     public class GenericUpdater<TEntity, TResult> where TEntity : class
     {
-        internal DbContext context;
-        internal DbSet<TEntity> dbSet;
+        internal DbContext sourceContext;
+        internal DbContext destinationContext;
+        internal DbSet<TEntity> dbSourceSet;
+        internal DbSet<TEntity> dbDestinationSet;
 
-        public GenericUpdater(DbContext context)
+        public GenericUpdater(DbContext sourceContext, DbContext destinationContext)
         {
-            this.context = context;
-            this.dbSet = context.Set<TEntity>();
+            this.destinationContext = destinationContext;
+            this.sourceContext = sourceContext;
+            this.dbSourceSet = sourceContext.Set<TEntity>();
+            this.dbDestinationSet = destinationContext.Set<TEntity>();
         }
 
         public TResult GetMax(Expression<Func<TEntity, TResult>> selector)
         {
-            var max = dbSet.Max(selector);
+            var max = dbDestinationSet.Max(selector);
             return max;
+        }
+
+        public int GetToUpdateData(Expression<Func<TEntity, TResult>> selector,
+             Expression<Func<TEntity, bool>> filter = null,
+             bool isInsert = true)
+        {
+            IQueryable<TEntity> query = dbSourceSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            var surveys = query.ToList();
+
+            foreach (var item in surveys)
+            {
+                if (isInsert)
+                {
+                    dbDestinationSet.Add(item);
+                }
+                else
+                {
+                    dbDestinationSet.Attach(item);
+                    destinationContext.Entry(item).State = EntityState.Modified;
+                }
+            }
+            var i = destinationContext.SaveChanges();
+            return i;
         }
     }
 }
