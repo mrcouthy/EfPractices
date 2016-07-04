@@ -78,6 +78,26 @@ namespace EfPractices
             context.Entry(entityToUpdate).State = EntityState.Modified;
         }
 
+        public virtual void InsertOrUpdate(TEntity entity,
+            Expression<Func<TEntity, bool>> identity)
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            if (identity != null)
+            {
+                query = query.Where(identity);
+            }
+
+            if (query.Count() > 0)
+            {
+                Update(entity);
+            }
+            else
+            {
+                Insert(entity);
+            }
+        }
+
         public virtual void Save()
         {
             context.SaveChanges();
